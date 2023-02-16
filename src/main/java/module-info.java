@@ -1,4 +1,4 @@
-module com.zetcode.firstex {
+module com.vorpal {
     requires javafx.controls;
-    exports com.zetcode;
+    exports com.vorpal;
 }
