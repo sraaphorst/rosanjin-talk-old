@@ -34,19 +34,6 @@ final public class InputPanel extends VBox {
         final TextField substitution = new TextField();
         final TextField value = new TextField();
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Row)) return false;
-            Row row = (Row) o;
-            return cb.equals(row.cb) && substitution.equals(row.substitution) && value.equals(row.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(cb, substitution, value);
-        }
-
         public Row() {
             // We check the delete button when the checkboxes are checked to see if it should be enabled
             // or plural.
@@ -82,28 +69,12 @@ final public class InputPanel extends VBox {
 
     final GridPane gridPane = new GridPane();
 
-    private void populateGridPane() {
-        // Remove the old rows and re-add the rows, as deletes can leave blank rows.
-        gridPane.getChildren().clear();
-
-        final var substitutionLabel = new Label("Substitution");
-        substitutionLabel.setStyle("-fx-text-alignment: center");
-        gridPane.add(substitutionLabel, 1, 0);
-        final var descriptionLabel = new Label("Description");
-        descriptionLabel.setStyle("-fx-text-alignment: center");
-        gridPane.add(descriptionLabel, 2, 0);
-
-        // Readd the rows.
-        rows.forEach(row -> gridPane.getChildren().addAll(row.cb, row.substitution, row.value));
-    }
-
     public InputPanel() {
         super();
         createUI();
     }
 
     void createUI() {
-        gridPane.setGridLinesVisible(true);
         gridPane.setHgap(10);
         // If we set a Vgap, when we remove rows, since they still technically stay in the GridPane,
         // we end up with uneven spacing.
@@ -116,8 +87,16 @@ final public class InputPanel extends VBox {
         final var c2 = new ColumnConstraints();
         c2.setPercentWidth(80);
         gridPane.getColumnConstraints().addAll(c0, c1, c2);
-        populateGridPane();
 
+        final var substitutionLabel = new Label("Substitution");
+        substitutionLabel.setStyle("-fx-text-alignment: center");
+        gridPane.add(substitutionLabel, 1, 0);
+        final var descriptionLabel = new Label("Description");
+        descriptionLabel.setStyle("-fx-text-alignment: center");
+        gridPane.add(descriptionLabel, 2, 0);
+
+        // Add the rows.
+        rows.forEach(row -> gridPane.getChildren().addAll(row.cb, row.substitution, row.value));
 
         final var hbox = new HBox(addButton, deleteButton);
         hbox.setPadding(new Insets(15));
@@ -145,7 +124,6 @@ final public class InputPanel extends VBox {
             rows.removeAll(rows.stream().filter(row -> row.cb.isSelected()).collect(Collectors.toList()));
 
             // Modify the UI.
-            populateGridPane();
             processDeleteButton();
             VBox.setVgrow(this, Priority.ALWAYS);
         });
