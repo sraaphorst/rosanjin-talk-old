@@ -64,7 +64,7 @@ final public class InputPanel extends VBox {
     private void processDeleteButton() {
         final var checkboxes = checkBoxCount();
         deleteButton.setDisable(checkboxes == 0L);
-        deleteButton.setText("Delete Row" + (checkboxes > 1 ? "(s)" : ""));
+        deleteButton.setText("Delete Row" + (checkboxes > 1 ? "s" : ""));
     }
 
     final GridPane gridPane = new GridPane();
@@ -83,9 +83,9 @@ final public class InputPanel extends VBox {
         final var c0 = new ColumnConstraints();
         c0.setPercentWidth(5);
         final var c1 = new ColumnConstraints();
-        c1.setPercentWidth(15);
+        c1.setPercentWidth(20);
         final var c2 = new ColumnConstraints();
-        c2.setPercentWidth(80);
+        c2.setPercentWidth(75);
         gridPane.getColumnConstraints().addAll(c0, c1, c2);
 
         final var substitutionLabel = new Label("Substitution");
@@ -98,6 +98,9 @@ final public class InputPanel extends VBox {
         // Add the rows.
         rows.forEach(row -> gridPane.getChildren().addAll(row.cb, row.substitution, row.value));
 
+        // Horizonal separator.
+        final var separator = new Separator();
+
         final var hbox = new HBox(addButton, deleteButton);
         hbox.setPadding(new Insets(15));
         hbox.setStyle("-fx-alignment: center");
@@ -106,10 +109,15 @@ final public class InputPanel extends VBox {
         addButton.setOnAction((final ActionEvent e) -> {
             final var row = new Row();
             rows.add(row);
+            System.out.println("Pref height was: " + gridPane.getPrefHeight());
             gridPane.addRow(gridPane.getRowCount(), row.cb, row.substitution, row.value);
 
             // Modify the UI.
             processDeleteButton();
+            final var prefHeight = gridPane.prefHeight(-1.0) + separator.prefHeight(-1.0) +
+                    hbox.prefHeight(-1.0) + 64;
+            this.setHeight(prefHeight);
+            System.out.println("Overall pref height is: " + prefHeight);
             VBox.setVgrow(this, Priority.ALWAYS);
         });
 
@@ -125,9 +133,18 @@ final public class InputPanel extends VBox {
 
             // Modify the UI.
             processDeleteButton();
+            final var prefHeight = gridPane.prefHeight(-1.0) + separator.prefHeight(-1.0) +
+                    hbox.prefHeight(-1.0) + 64;
+            this.setHeight(prefHeight);
+            System.out.println("Overall pref height is: " + prefHeight);
             VBox.setVgrow(this, Priority.ALWAYS);
         });
 
-        this.getChildren().addAll(gridPane, hbox);
+        this.getChildren().addAll(gridPane, separator, hbox);
+        gridPane.prefHeight(-1);
+        final var prefHeight = gridPane.prefHeight(-1.0) + separator.prefHeight(-1.0) +
+                hbox.prefHeight(-1.0) + 64;
+        System.out.println("Overall pref height is: " + prefHeight);
+        this.setHeight(prefHeight);
     }
 }
