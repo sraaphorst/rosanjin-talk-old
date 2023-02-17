@@ -30,7 +30,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.3</version>
                 <configuration>
-                    <mainClass>com.zetcode.FirstEx</mainClass>
+                    <mainClass>com.vorpal.FirstEx</mainClass>
                 </configuration>
             </plugin>
             <plugin>
