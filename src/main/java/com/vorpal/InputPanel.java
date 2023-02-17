@@ -5,18 +5,20 @@ package com.vorpal;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
+import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
  * An input panel to manage the substitution information for the main corpus.
  */
-final public class InputPanel extends VBox {
+final public class InputPanel extends BorderPane {
     // Holds the rows, which contain the UI elements for each row.
     private final List<Row> rows = new ArrayList<>();
 
@@ -40,9 +42,10 @@ final public class InputPanel extends VBox {
             cb.setSelected(false);
             cb.setFocusTraversable(false);
             cb.setOnAction(deleteCheck);
+            cb.setAlignment(Pos.CENTER_RIGHT);
 
             substitution.setText("{" + (++rowIdx) + "}");
-            substitution.setStyle("-fx-alignment: center; -fx-text-alignment: right");
+            substitution.setAlignment(Pos.CENTER);;
             substitution.setDisable(true);
             substitution.setFocusTraversable(false);
         }
@@ -67,61 +70,68 @@ final public class InputPanel extends VBox {
         deleteButton.setText("Delete Row" + (checkboxes > 1 ? "s" : ""));
     }
 
-    final GridPane gridPane = new GridPane();
-
     public InputPanel() {
         super();
         createUI();
     }
 
     void createUI() {
+        final GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
-        // If we set a Vgap, when we remove rows, since they still technically stay in the GridPane,
-        // we end up with uneven spacing.
-//        gridPane.setVgap(0);
         gridPane.setPadding(new Insets(10));
+
+        // Constraints on the columns.
         final var c0 = new ColumnConstraints();
-        c0.setPercentWidth(5);
+        c0.setPercentWidth(10);
         final var c1 = new ColumnConstraints();
         c1.setPercentWidth(20);
         final var c2 = new ColumnConstraints();
-        c2.setPercentWidth(75);
+        c2.setPercentWidth(70);
         gridPane.getColumnConstraints().addAll(c0, c1, c2);
 
-        final var substitutionLabel = new Label("Substitution");
-        substitutionLabel.setStyle("-fx-text-alignment: center");
+        final var substitutionLabel = new Label("Substitute");
+        substitutionLabel.setTextAlignment(TextAlignment.CENTER);
         gridPane.add(substitutionLabel, 1, 0);
         final var descriptionLabel = new Label("Description");
-        descriptionLabel.setStyle("-fx-text-alignment: center");
+        descriptionLabel.setTextAlignment(TextAlignment.CENTER);
         gridPane.add(descriptionLabel, 2, 0);
 
         // Add the rows.
-        rows.forEach(row -> gridPane.getChildren().addAll(row.cb, row.substitution, row.value));
+        rows.forEach(row -> {
+//            gridPane.getChildren().addAll(row.cb, row.substitution, row.value)
+            final var rows = gridPane.getRowCount();
+            gridPane.add(row.cb, 0, rows);
+            gridPane.add(row.substitution, 1, rows);
+            gridPane.add(row.value, 2, rows);
+        });
 
-        // Horizonal separator.
-        final var separator = new Separator();
+        // Wrap the GridPane in a vertical ScrollPane.
+        final var scrollPane = new ScrollPane();
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane.setContent(gridPane);
+//        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
 
-        final var hbox = new HBox(addButton, deleteButton);
-        hbox.setPadding(new Insets(15));
-        hbox.setStyle("-fx-alignment: center");
-        hbox.setSpacing(100);
+        // Do not allow horizontal scrolling.
+        scrollPane.addEventFilter(ScrollEvent.SCROLL,
+                evt -> { if (evt.getDeltaX() != 0) evt.consume(); });
+
+        // Create the button panel.
+        final var buttonBox = new HBox(addButton, deleteButton);
+        buttonBox.setPadding(new Insets(15));
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setSpacing(100);
 
         addButton.setOnAction((final ActionEvent e) -> {
             final var row = new Row();
             rows.add(row);
-            System.out.println("Pref height was: " + gridPane.getPrefHeight());
             gridPane.addRow(gridPane.getRowCount(), row.cb, row.substitution, row.value);
 
             // Modify the UI.
             processDeleteButton();
-            final var prefHeight = gridPane.prefHeight(-1.0) + separator.prefHeight(-1.0) +
-                    hbox.prefHeight(-1.0) + 64;
-            this.setHeight(prefHeight);
-            System.out.println("Overall pref height is: " + prefHeight);
-            VBox.setVgrow(this, Priority.ALWAYS);
         });
 
-        addButton.fire();
         deleteButton.setOnAction((final ActionEvent e) -> {
             // Remove the rows from the UI.
             rows.stream()
@@ -133,18 +143,11 @@ final public class InputPanel extends VBox {
 
             // Modify the UI.
             processDeleteButton();
-            final var prefHeight = gridPane.prefHeight(-1.0) + separator.prefHeight(-1.0) +
-                    hbox.prefHeight(-1.0) + 64;
-            this.setHeight(prefHeight);
-            System.out.println("Overall pref height is: " + prefHeight);
-            VBox.setVgrow(this, Priority.ALWAYS);
         });
 
-        this.getChildren().addAll(gridPane, separator, hbox);
-        gridPane.prefHeight(-1);
-        final var prefHeight = gridPane.prefHeight(-1.0) + separator.prefHeight(-1.0) +
-                hbox.prefHeight(-1.0) + 64;
-        System.out.println("Overall pref height is: " + prefHeight);
-        this.setHeight(prefHeight);
+        // Put everything together in this BorderPane.
+        setPadding(new Insets(20));
+        setCenter(scrollPane);
+        setBottom(buttonBox);
     }
 }
