@@ -1,4 +1,4 @@
 module com.vorpal {
     requires javafx.controls;
-    exports com.vorpal;
+    exports com.vorpal.rosanjintalk;
 }
