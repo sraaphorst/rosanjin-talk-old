@@ -1,10 +1,8 @@
-package com.vorpal;
+package com.vorpal.rosanjintalk;
 
 // By Sebastian Raaphorst, 2023.
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
