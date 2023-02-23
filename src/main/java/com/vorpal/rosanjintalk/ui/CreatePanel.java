@@ -1,4 +1,4 @@
-package com.vorpal.rosanjintalk;
+package com.vorpal.rosanjintalk.ui;
 
 // By Sebastian Raaphorst, 2023.
 
@@ -9,7 +9,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;

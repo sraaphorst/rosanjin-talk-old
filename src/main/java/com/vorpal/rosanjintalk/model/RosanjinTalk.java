@@ -2,8 +2,6 @@ package com.vorpal.rosanjintalk.model;
 
 // By Sebastian Raaphorst, 2023.
 
-import com.vorpal.rosanjintalk.InputEmptyException;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -17,15 +15,19 @@ import java.util.stream.Collectors;
  * it is the easiest solution and should not be brittle.
  */
 public class RosanjinTalk implements Serializable {
+    // The name of the story.
+    public final String name;
+
     // The list of inputs to the text for substitution.
     // Key 1, for example, will prompt inputs[1] and then substitute any occurrences of "{1}" in the text.
     // with the response.
     public final Map<Integer, String> inputs;
     public final String text;
 
-    public RosanjinTalk(final Map<Integer, String> inputs, final String text) {
+    public RosanjinTalk(final String name, final Map<Integer, String> inputs, final String text) {
         if (isInvalid(inputs.keySet(), text))
             throw new RuntimeException("There are substitutions in the story body that are not in the inputs.");
+        this.name = name;
         this.inputs = Collections.unmodifiableMap(inputs);
         this.text = text;
     }
