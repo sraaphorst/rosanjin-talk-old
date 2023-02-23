@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 public class AdLibs extends Application {
     @Override
     public void start(final Stage stage) {
-        final var root = new InputPanel();
+        final var root = new CreatePanel();
         final var scene = new Scene(root, 400, 500);
         stage.setScene(scene);
 

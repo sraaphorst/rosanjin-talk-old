@@ -103,10 +103,10 @@ public class RosanjinTalk implements Serializable {
                 .ifPresent(key -> { throw new InputEmptyException(key); });
 
         // Otherwise, substitute the strings. I forgot how terrible Java programming is after Kotlin.
-        // No decent fold expression so we just have to do this the hard way.
+        // No decent fold expression, so we just have to do this the hard way.
         String substitutedText = text;
         for (final var entry : trimmedAnswers.entrySet())
-            substitutedText = substitutedText.replaceAll("{" + entry.getKey() + "}", entry.getValue());
+            substitutedText = substitutedText.replace("{" + entry.getKey() + "}", entry.getValue());
         return substitutedText;
     }
 }

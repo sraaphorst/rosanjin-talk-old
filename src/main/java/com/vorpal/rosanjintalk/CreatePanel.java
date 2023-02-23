@@ -9,16 +9,18 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * An input panel to manage the substitution information for the main corpus.
+ * An input panel to manage the substitution information for the main text.
  */
-final public class InputPanel extends BorderPane {
+final public class CreatePanel extends BorderPane {
     // Holds the rows, which contain the UI elements for each row.
     private final List<Row> rows = new ArrayList<>();
 
@@ -70,7 +72,7 @@ final public class InputPanel extends BorderPane {
         deleteButton.setText("Delete Row" + (checkboxes > 1 ? "s" : ""));
     }
 
-    public InputPanel() {
+    public CreatePanel() {
         super();
         createUI();
     }
@@ -97,20 +99,13 @@ final public class InputPanel extends BorderPane {
         gridPane.add(descriptionLabel, 2, 0);
 
         // Add the rows.
-        rows.forEach(row -> {
-//            gridPane.getChildren().addAll(row.cb, row.substitution, row.value)
-            final var rows = gridPane.getRowCount();
-            gridPane.add(row.cb, 0, rows);
-            gridPane.add(row.substitution, 1, rows);
-            gridPane.add(row.value, 2, rows);
-        });
+        rows.forEach(row -> gridPane.getChildren().addAll(row.cb, row.substitution, row.value));
 
         // Wrap the GridPane in a vertical ScrollPane.
         final var scrollPane = new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setContent(gridPane);
-//        scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
 
         // Do not allow horizontal scrolling.
@@ -145,9 +140,29 @@ final public class InputPanel extends BorderPane {
             processDeleteButton();
         });
 
+        final var b = new Button("Process");
+        b.setOnAction(e -> CreatePanel.this.getInputs());
+        buttonBox.getChildren().add(b);
+
         // Put everything together in this BorderPane.
         setPadding(new Insets(20));
         setCenter(scrollPane);
         setBottom(buttonBox);
+    }
+
+    public Map<Integer, String> getInputs() {
+        // First iterate through the inputs and check that none are empty.
+        final var emptyRow = rows.stream()
+                .filter(r -> r.value.getText().trim().isEmpty())
+                .findFirst();
+
+        if (emptyRow.isPresent()) {
+            emptyRow.ifPresent(r -> {
+                System.out.println("Found empty text field: " + r.substitution.getText());
+                r.value.requestFocus();
+            });
+        }
+
+        return null;
     }
 }
